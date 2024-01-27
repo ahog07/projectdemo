@@ -22,7 +22,7 @@ public class ArtController {
         this.artRepository = artRepository;
     }
 
-    @GetMapping("/")
+    @GetMapping("/A")
     public String showArtList(Model model) {
         List<Art> artList = artRepository.findAll();
         model.addAttribute("artList", artList);
