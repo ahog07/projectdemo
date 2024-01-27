@@ -1,0 +1,35 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: 17
+
+    - name: Log in to Docker Hub
+      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build Docker image
+      run: docker build -t mchus00/apppa:tagname .
+
+    - name: Install Snyk CLI
+      run: npm install -g snyk
+
+    - name: Authenticate with Snyk (using your Snyk API token)
+      run: snyk auth ${{ secrets.SNYK_API_TOKEN }}
+
+    - name: Scan Docker image with Snyk
+      run: snyk test --docker mchus00/apppa:tagname
